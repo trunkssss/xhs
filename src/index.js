@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import ReactDOMClient from 'react-dom/client';
-import App from './App';
+import App from '@/frame/layout';
 const container = document.getElementById('root');
 
 if (container) {
