@@ -1,13 +1,12 @@
 {
   "scripts": {
-    "start": "webpack --mode development --watch",
-    "start:electron": "electron-forge start",
+    "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
   "name": "xhs",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": ".webpack/main",
   "license": "MIT",
   "author": "zjay",
   "description": "xhs",
@@ -22,9 +21,14 @@
     "@electron-forge/maker-zip": "^7.4.0",
     "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
     "@electron-forge/plugin-fuses": "^7.4.0",
+    "@electron-forge/plugin-webpack": "^7.4.0",
     "@electron/fuses": "^1.8.0",
+    "@vercel/webpack-asset-relocator-loader": "^1.7.4",
     "babel-loader": "^9.1.3",
+    "chokidar": "^3.6.0",
+    "clean-webpack-plugin": "^4.0.0",
     "electron": "^31.0.2",
+    "html-webpack-plugin": "^5.6.0",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"
   },
