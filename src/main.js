@@ -3,7 +3,7 @@ const path = require('node:path')
 const { Builder, By, Browser } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const http = require('https');
-const { exec } = require('child_process');
+const { exec, execFile } = require('child_process');
 
 app.commandLine.appendSwitch('remote-debugging-port', '9222');
 
@@ -17,8 +17,28 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+// console.log(path.join(path.resolve(), './node_modules/.bin'))
+// exec('chromedriver', {cwd: path.join(path.resolve(), './node_modules/.bin')}, (err) => {
+//   console.log(err)
+// })
+// execFile(path.join(path.resolve(), './chromedriver.exe'), (error, stdout, stderr) => {
+//   if (error) {
+//     console.error(`执行错误: ${error}`);
+//     return;
+//   }
+// });
 
-exec(path.join(__dirname, '../../node_modules/.bin/chromedriver'))
+const driverPath = app.isPackaged ? path.join(process.resourcesPath, 'extraResources', 'chromedriver.exe')
+                                  : path.join(path.resolve(), './extraResources/chromedriver.exe')
+
+execFile(driverPath, (error, stdout, stderr) => {
+  if (error) {
+    console.error(`执行错误: ${error}`);
+    return;
+  }
+  console.log(`输出: ${stdout}`);
+});
+
 
 let driver
 const controlSelenium = async(e, status, data) => {
@@ -27,8 +47,7 @@ const controlSelenium = async(e, status, data) => {
   if (!driver) {
     driver = await new Builder()
               .usingServer('http://localhost:9515')
-              .setChromeOptions(new chrome.Options()
-              .debuggerAddress('localhost:9222'))
+              .setChromeOptions(new chrome.Options().debuggerAddress('localhost:9222'))
               .forBrowser(Browser.CHROME).build();
   }
   
@@ -51,7 +70,7 @@ const controlSelenium = async(e, status, data) => {
 
   } catch(e) {}
 
-  return title
+  return driverPath
 }
 
 let loginWin
@@ -94,6 +113,7 @@ const toggleWProxyWindow = async(e, data) => {
   const {id, name, ip, ipAccount, ipPassword, winId} = data;
   
   const callback = () => {
+    driver.quit()
     mainWin.webContents.send('proxyWinClose', { id, winId: '', winHandle: '' });
   }
 
@@ -106,9 +126,8 @@ const toggleWProxyWindow = async(e, data) => {
   }
   if (!driver) {
     driver = await new Builder()
-              .usingServer('http://localhost:9515')
-              .setChromeOptions(new chrome.Options()
-              .debuggerAddress('localhost:9222'))
+              .usingServer('http://localhost:9515') 
+              .setChromeOptions(new chrome.Options().debuggerAddress('localhost:9222'))
               .forBrowser(Browser.CHROME).build();
   }
 
