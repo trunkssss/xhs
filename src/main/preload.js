@@ -11,11 +11,15 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 })
 
-contextBridge.exposeInMainWorld('versions', {
-  node: () => process.versions.node,
-  chrome: () => process.versions.chrome,
-  electron: () => process.versions.electron,
-  runSelenium: () => ipcRenderer.invoke('runSelenium'),
-  // run: () => runSelenium(),
-  // 除函数之外，我们也可以暴露变量
+contextBridge.exposeInMainWorld('mainContext', {
+  // node: () => process.versions.node,
+  // chrome: () => process.versions.chrome,
+  // electron: () => process.versions.electron,
+  controlSelenium: (status, data) => ipcRenderer.invoke('controlSelenium', status, data),
+  toggleWindow: (data) => ipcRenderer.invoke('toggleWindow', data),
+  onProxyWinClose: (callback) => {
+    ipcRenderer.once('proxyWinClose', callback); 
+  },
 })
+
+

@@ -1,7 +1,41 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const ROOT_PATH = path.resolve();
+
+const getCssLoaders = (isModule) => {
+  const cssLoader = isModule ? {
+    loader: 'css-loader',
+    options: {
+      modules: {
+        localIdentName: '[name]-[local]-[hash:5]',
+      },
+    },
+  } : 'css-loader';
+
+  return [
+    MiniCssExtractPlugin.loader,
+    cssLoader,
+    {
+      loader: 'postcss-loader',
+      options: {
+        postcssOptions: {
+          plugins: [
+            [
+              'postcss-preset-env',
+              {
+                autoprefixer: {
+                  grid: true,
+                },
+              },
+            ],
+          ],
+        },
+      },
+    },
+  ];
+};
 
 module.exports = {
   // entry: {
@@ -30,19 +64,50 @@ module.exports = {
           },
         },
       },
+      {
+        test: /\.css$/,
+        use: [...getCssLoaders(false),],
+      },
+      {
+        test: /\.less$/,
+        oneOf: [
+          {
+            resourceQuery: /css_modules/,
+            use: [
+              ...getCssLoaders(true),
+              {
+                loader: 'less-loader',
+                options: {
+                  sourceMap: false,
+                  lessOptions: {
+                    javascriptEnabled: true,
+                  },
+                },
+              },
+            ],
+          },
+          {
+            use: [
+              ...getCssLoaders(false),
+              {
+                loader: 'less-loader',
+                options: {
+                  sourceMap: false,
+                  lessOptions: {
+                    javascriptEnabled: true,
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
-  // plugins: [
-  //   new CleanWebpackPlugin(),
-  //   new HtmlWebpackPlugin({
-  //     template: path.resolve(ROOT_PATH, './public/index.html'),
-  //     filename: 'index.html',
-  //     chunks: ['app'],             
-  //   }),
-  //   new HtmlWebpackPlugin({
-  //     template: path.resolve(ROOT_PATH, './public/login.html'),
-  //     filename: 'login.html',
-  //     chunks: ['login'],             
-  //   }),
-  // ],
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].[contenthash].css',
+      chunkFilename: 'css/[id].[contenthash].css',
+    }),
+  ],
 };

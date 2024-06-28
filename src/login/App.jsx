@@ -13,7 +13,7 @@ const Login = () => {
     <div className="login">
       <LoginForm
         // logo="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
-        title="登录测试"
+        title="可乐私域"
         subTitle=" "
         onFinish={handleLogin}
         initialValues={{
